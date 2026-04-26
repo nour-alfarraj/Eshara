@@ -1,0 +1,35 @@
+{
+  "name": "Eshara | مترجم لغة الإشارة",
+  "short_name": "Eshara",
+  "description": "Eshara — مترجم لغة الإشارة العربية بالذكاء الاصطناعي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0a0f1e",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "education"],
+  "shortcuts": [
+    {
+      "name": "الترجمة المباشرة",
+      "short_name": "الترجمة",
+      "description": "فتح قسم الترجمة المباشرة",
+      "url": "/?section=translate",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

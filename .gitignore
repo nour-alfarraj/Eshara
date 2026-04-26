@@ -1,0 +1,5 @@
+node_modules/ 
+android/ 
+www/ 
+*.mp4 
+server.log 

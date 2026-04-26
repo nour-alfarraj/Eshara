@@ -1,0 +1,33 @@
+{
+  "key_to_ar": {
+    "alif": "ا",
+    "ba": "ب",
+    "ta": "ت",
+    "tha": "ث",
+    "jeem": "ج",
+    "ha": "ه",
+    "haa": "ح",
+    "kha": "خ",
+    "dal": "د",
+    "thal": "ذ",
+    "ra": "ر",
+    "zay": "ز",
+    "seen": "س",
+    "sheen": "ش",
+    "saad": "ص",
+    "daad": "ض",
+    "taa_heavy": "ط",
+    "thaa_heavy": "ظ",
+    "taa_marbouta": "ة",
+    "ain": "ع",
+    "ghain": "غ",
+    "fa": "ف",
+    "qaf": "ق",
+    "kaaf": "ك",
+    "laam": "ل",
+    "meem": "م",
+    "noon": "ن",
+    "waw": "و",
+    "yaa": "ي"
+  }
+}

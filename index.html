@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="description" content="Eshara — مترجم لغة الإشارة العربية بالذكاء الاصطناعي" />
+  <title id="pageTitle">Eshara | مترجم لغة الإشارة</title>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&family=Space+Mono&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===== CSS VARIABLES — Dark (default) ===== */
+    :root {
+      --bg:         #0a0f1e;
+      --bg-card:    #111827;
+      --bg-hover:   #1a2335;
+      --accent:     #4db8ff;
+      --accent-dim: #2699e0;
+      --accent-glow:#4db8ff22;
+      --green:      #1a9e5c;
+      --orange:     #e67e22;
+      --red:        #e74c3c;
+      --text:       #e8f0fb;
+      --text-muted: #8892a4;
+      --border:     #1e2d40;
+      --radius:     14px;
+      --radius-sm:  8px;
+      --shadow:     0 4px 24px #00000066;
+      --transition: 0.25s cubic-bezier(.4,0,.2,1);
+      --font-ar:    'IBM Plex Sans Arabic', sans-serif;
+      --font-en:    'Inter', system-ui, -apple-system, sans-serif;
+      --font:       var(--font-ar);
+      --font-mono:  'Space Mono', monospace;
+    }
+
+    html[lang="en"] {
+      --font: var(--font-en);
+    }
+
+    /* Light Mode */
+    body.light {
+      --bg:         #f5f9ff;
+      --bg-card:    #ffffff;
+      --bg-hover:   #f0f4f8;
+      --accent:     #1a7fd4;
+      --accent-dim: #1565c0;
+      --accent-glow:#1a7fd422;
+      --text:       #0a0f1e;
+      --text-muted: #6b7280;
+      --border:     #e5e7eb;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ===== BACKGROUND ===== */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: -2;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      transition: opacity 0.3s ease;
+    }
+    .bg-glow {
+      position: fixed; inset: 0; z-index: -1;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, #4db8ff18, transparent);
+      transition: background 0.3s ease;
+    }
+    body.light .bg-glow {
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, #1a7fd418, transparent);
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 64px;
+      background: #0a0f1eee;
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    body.light header {
+      background: #f5f9ffee;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 22px; font-weight: 700;
+      color: var(--accent); letter-spacing: 3px;
+      text-decoration: none;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .logo-img {
+      width: 38px; height: 38px;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+    body.dark .logo-img {
+      mix-blend-mode: screen;
+    }
+
+    nav ul {
+      list-style: none; display: flex; gap: 6px; align-items: center;
+    }
+    nav a {
+      display: block; padding: 7px 16px;
+      color: var(--text-muted); font-weight: 600; font-size: 14px;
+      text-decoration: none; border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    nav a:hover  { color: var(--text); background: var(--bg-hover); }
+    nav a.active { color: var(--accent); background: var(--accent-glow); }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    /* theme toggle */
+    .theme-toggle {
+      width: 44px; height: 24px;
+      background: #cce0f5;
+      border-radius: 12px; border: none; cursor: pointer;
+      position: relative; transition: var(--transition);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .theme-toggle::after {
+      content: ''; position: absolute;
+      top: 3px; right: 3px;
+      width: 18px; height: 18px;
+      background: var(--accent); border-radius: 50%;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    body.light .theme-toggle {
+      background: #ffd700;
+    }
+    body.light .theme-toggle::after { 
+      right: 23px;
+      background: #ffffff;
+    }
+
+    /* ===== MAIN ===== */
+    main { flex: 1; max-width: 1100px; margin: 0 auto; width: 100%; padding: 40px 20px; }
+
+    section { display: none; animation: fadeUp 0.4s ease forwards; }
+    section.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== TYPOGRAPHY ===== */
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700; line-height: 1.2;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 12px;
+    }
+    h2 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 28px 0 12px; }
+    p  { color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: var(--transition);
+    }
+    .card:hover { border-color: var(--accent-dim); box-shadow: 0 0 20px var(--accent-glow); }
+    .card h3 { color: var(--accent); font-size: 15px; margin-bottom: 14px; font-weight: 600; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: var(--radius-sm);
+      font-family: var(--font); font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: var(--transition);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent); color: #0a0f1e;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .btn-primary:hover { background: #33ddff; box-shadow: 0 0 24px var(--accent-glow); transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent; color: var(--accent);
+      border: 1px solid var(--accent); padding: 9px 22px;
+    }
+    .btn-outline:hover { background: var(--accent-glow); }
+
+    .btn-ghost {
+      background: var(--bg-hover); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { background: #ff7070; }
+
+    .btn-sm { padding: 7px 14px; font-size: 13px; }
+
+    /* ===== HOME SECTION ===== */
+    #home.active {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center; min-height: 70vh;
+    }
+    .home-text { display: flex; flex-direction: column; gap: 20px; }
+    .home-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--accent); font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .home-title { font-size: clamp(2rem, 4vw, 3.2rem); }
+    .home-desc { font-size: 1.05rem; color: var(--text-muted); max-width: 480px; }
+    .home-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .feature-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-top: 10px;
+    }
+    .feature-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px;
+      transition: var(--transition);
+    }
+    .feature-item:hover { border-color: var(--accent-dim); transform: translateY(-2px); }
+    .feature-icon { font-size: 20px; margin-bottom: 6px; }
+    .feature-item h4 { font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    .feature-item p  { font-size: 12px; margin: 0; }
+
+    .home-video video {
+      width: 100%; border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 40px var(--accent-glow);
+    }
+
+    /* ===== TRANSLATE SECTION ===== */
+    .translate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .camera-box { position: relative; }
+    .camera-box video, .camera-box canvas {
+      width: 100%; border-radius: var(--radius);
+      border: 1px solid var(--border); display: block;
+    }
+    .camera-overlay {
+      position: absolute; top: 10px; right: 10px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .cam-status {
+      display: flex; align-items: center; gap: 6px;
+      background: #0a0f1ecc; padding: 5px 10px;
+      border-radius: 20px; font-size: 12px;
+      backdrop-filter: blur(8px);
+    }
+    .cam-status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .cam-status-dot.live { background: var(--red); animation: blink 1s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .result-panel { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .char-display {
+      font-size: 48px; font-weight: 700; color: var(--accent);
+      font-family: var(--font-mono); text-align: center; min-width: 60px;
+    }
+    .prob-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .prob-bar-wrap span { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .prob-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .prob-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s ease; }
+
+    .text-output {
+      background: var(--bg-hover); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px;
+      min-height: 60px; font-size: 18px; line-height: 1.6;
+      word-break: break-word;
+    }
+    .text-output.empty::before { content: '...'; opacity: 0.3; }
+
+    .output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .message-video-wrap {
+      position: relative; aspect-ratio: 16/9;
+      background: #000; border-radius: var(--radius-sm);
+      overflow: hidden; border: 1px solid var(--border);
+    }
+    .video-placeholder {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      color: var(--text-muted); font-size: 14px;
+    }
+    .video-placeholder-icon { font-size: 32px; opacity: 0.5; }
+    #videoMessage { width: 100%; height: 100%; display: none; object-fit: cover; }
+    #videoMessage.show { display: block; }
+
+    .stt-textarea {
+      width: 100%; background: var(--bg-hover); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px; color: var(--text);
+      font-family: var(--font); font-size: 15px; resize: none;
+      transition: border-color 0.3s ease;
+    }
+    .stt-textarea:focus { outline: none; border-color: var(--accent); }
+
+    .quick-phrases { display: flex; gap: 6px; flex-wrap: wrap; }
+    .quick-btn {
+      padding: 6px 12px; background: var(--bg-hover); border: 1px solid var(--border);
+      border-radius: 20px; font-size: 13px; color: var(--text); cursor: pointer;
+      transition: var(--transition);
+    }
+    .quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .quick-btn.active { background: var(--accent); color: #0a0f1e; border-color: var(--accent); }
+
+    /* ===== ABOUT SECTION ===== */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+    .stat-item { text-align: center; padding: 20px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); }
+    .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+    .stat-label { font-size: 13px; color: var(--text-muted); }
+
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+    .team-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; text-align: center;
+      transition: var(--transition);
+    }
+    .team-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .team-avatar {
+      width: 80px; height: 80px; background: var(--bg-hover);
+      border-radius: 50%; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; border: 2px solid var(--border);
+    }
+    .team-card h4 { margin-bottom: 4px; color: var(--text); }
+    .team-card p { font-size: 13px; margin: 0; }
+
+    /* ===== CONTACT SECTION ===== */
+    .contact-wrap { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
+    .contact-info { display: flex; flex-direction: column; gap: 24px; }
+    .contact-item { display: flex; gap: 16px; align-items: flex-start; }
+    .contact-item-icon {
+      width: 44px; height: 44px; background: var(--accent-glow);
+      border-radius: var(--radius-sm); display: flex;
+      align-items: center; justify-content: center; font-size: 20px;
+      color: var(--accent); flex-shrink: 0;
+    }
+    .contact-item-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .contact-item-val { font-size: 16px; color: var(--text); font-weight: 600; }
+
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-size: 14px; font-weight: 600; color: var(--text); }
+    .form-group input, .form-group textarea {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px; color: var(--text);
+      font-family: var(--font); transition: var(--transition);
+    }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    /* ===== TOAST ===== */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--accent); color: #0a0f1e; padding: 12px 24px;
+      border-radius: 30px; font-weight: 700; font-size: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 1000;
+      transition: transform 0.4s cubic-bezier(.18,.89,.32,1.28);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ===== SPLASH ===== */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #0a0f1e; display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #splash.hide { opacity: 0; visibility: hidden; }
+    .splash-content { text-align: center; position: relative; }
+    .splash-logo { width: 120px; margin-bottom: 20px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+    .splash-dot {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 10px; height: 10px; background: var(--accent); border-radius: 50%;
+      z-index: -1; transition: transform 1s ease-in;
+    }
+    .splash-dot.expand { transform: translate(-50%, -50%) scale(300); }
+
+    /* ===== HAMBURGER ===== */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 5px;
+    }
+    .hamburger span { width: 24px; height: 2px; background: var(--text); transition: 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      header { padding: 0 20px; }
+      nav {
+        position: fixed; top: 64px; left: 0; right: 0;
+        background: var(--bg-card); border-bottom: 1px solid var(--border);
+        padding: 20px; display: none;
+      }
+      nav.open { display: block; }
+      nav ul { flex-direction: column; align-items: stretch; }
+      .hamburger { display: flex; }
+      #home.active { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+      .home-desc { margin: 0 auto 16px; }
+      .home-actions { justify-content: center; }
+      .home-video { order: -1; }
+      .home-text { order: 1; }
+      .translate-grid, .about-grid, .contact-wrap { grid-template-columns: 1fr; }
+      .contact-wrap { order: 2; }
+      .contact-info { order: 2; }
+      .contact-form { order: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <div class="splash-content">
+      <img src="logo_splash.png" alt="Eshara" class="splash-logo" />
+      <div class="splash-dot" id="splashDot"></div>
+    </div>
+  </div>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div id="toast"></div>
+
+  <header>
+    <a class="logo" href="#" data-target="home">
+      <img src="logo.png" alt="Eshara Logo" class="logo-img" />
+      ESHARA
+    </a>
+
+    <nav id="mainNav">
+      <ul>
+        <li><a href="#" class="nav-link active" data-target="home" data-i18n="nav_home">الرئيسية</a></li>
+        <li><a href="#" class="nav-link" data-target="translate" data-i18n="nav_translate">الترجمة</a></li>
+        <li><a href="#" class="nav-link" data-target="about" data-i18n="nav_about">عن المشروع</a></li>
+        <li><a href="#" class="nav-link" data-target="contact" data-i18n="nav_contact">تواصل معنا</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+      <button class="btn btn-outline btn-sm" id="langToggle">EN</button>
+      <button class="theme-toggle" id="themeToggle"></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="active">
+      <div class="home-text">
+        <span class="home-eyebrow" data-i18n="home_eyebrow">🤟 مترجم لغة الإشارة</span>
+        <h1 class="home-title" data-i18n="home_title">تواصل بلا حدود مع لغة الإشارة</h1>
+        <p class="home-desc" data-i18n="home_desc">
+          <strong>Eshara</strong> يستخدم الذكاء الاصطناعي وMediaPipe لترجمة لغة الإشارة العربية فورياً، مما يُسهّل التواصل بين الصم والمجتمع.
+        </p>
+        <div class="home-actions">
+          <button class="btn btn-primary" data-target="translate" data-i18n="home_start_btn">🚀 ابدأ الترجمة</button>
+          <button class="btn btn-outline" data-target="about" data-i18n="home_about_btn">تعرّف علينا</button>
+        </div>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <h4 data-i18n="feat_realtime_title">ترجمة فورية</h4>
+            <p data-i18n="feat_realtime_desc">تحويل الإشارات إلى نصوص في أجزاء من الثانية</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🎤</div>
+            <h4 data-i18n="feat_voice_title">دعم الصوت</h4>
+            <p data-i18n="feat_voice_desc">تحويل الكلام المنطوق لإشارات مرئية للصم</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🌙</div>
+            <h4 data-i18n="feat_theme_title">وضع ليلي / نهاري</h4>
+            <p data-i18n="feat_theme_desc">واجهة مريحة في جميع الأوقات</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📱</div>
+            <h4 data-i18n="feat_pwa_title">يعمل كـ App</h4>
+            <p data-i18n="feat_pwa_desc">قابل للتنصيب على الهاتف مثل تطبيق حقيقي</p>
+          </div>
+        </div>
+      </div>
+      <div class="home-video">
+        <video autoplay muted loop playsinline>
+          <source src="ahlawsahla.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </section>
+
+    <!-- TRANSLATE -->
+    <section id="translate">
+      <h1 data-i18n="translate_title">الترجمة المباشرة</h1>
+      <p data-i18n="translate_desc">شغّل الكاميرا وابدأ بالإشارة — سيتعرف النظام على الحروف تلقائياً</p>
+      <div class="translate-grid">
+        <!-- Camera -->
+        <div class="card">
+          <h3 data-i18n="cam_user_title">📷 كاميرا المستخدم — ترجمة الإشارات</h3>
+          <div class="camera-box">
+            <video id="videoUser" autoplay playsinline></video>
+            <canvas id="snapUser" width="320" height="240" style="display:none"></canvas>
+            <div class="camera-overlay">
+              <div class="cam-status">
+                <div class="cam-status-dot" id="camDot"></div>
+                <span id="camLabel" data-i18n="cam_status_off">غير مفعّل</span>
+              </div>
+            </div>
+          </div>
+          <div class="result-panel">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="char-display" id="char">—</div>
+              <div style="flex:1">
+                <div class="prob-bar-wrap">
+                  <span data-i18n="prob_label">الاحتمال</span>
+                  <div class="prob-bar"><div class="prob-bar-fill" id="probBar"></div></div>
+                  <span id="prob">0%</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-output empty" id="preview"></div>
+            <div class="output-actions">
+              <button class="btn btn-primary btn-sm" id="toggleCameraUser" data-i18n="btn_start_cam">🎥 تشغيل الكاميرا</button>
+              <button class="btn btn-ghost btn-sm" id="speakText" data-i18n="btn_speak">🔊 نطق النص</button>
+              <button class="btn btn-danger btn-sm" id="clearUserText" data-i18n="btn_clear">🗑️ مسح</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phrases -->
+        <div class="card">
+          <h3 data-i18n="msg_panel_title">💬 لوحة الرسائل للموظّف</h3>
+          <div class="message-video-wrap">
+            <div class="video-placeholder" id="videoPlaceholder">
+              <div class="video-placeholder-icon">🎬</div>
+              <span data-i18n="video_placeholder">سيظهر هنا فيديو الإشارة</span>
+            </div>
+            <video id="videoMessage" controls>
+              <source src="ahlawsahla.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+            <div class="output-actions">
+              <button class="btn btn-primary btn-sm" id="toggleMic" data-i18n="btn_start_mic">🎤 تشغيل المايك</button>
+              <button class="btn btn-ghost btn-sm" id="clearMic" data-i18n="btn_clear_mic">مسح النص</button>
+            </div>
+            <textarea class="stt-textarea" id="deafText" rows="4" data-i18n-placeholder="mic_placeholder" placeholder="سيظهر هنا كلام الموظّف بعد التعرف الصوتي..."></textarea>
+            <div>
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:600;" data-i18n="quick_phrases_label">عبارات سريعة:</div>
+              <div class="quick-phrases">
+                <button class="quick-btn" data-video="salam.mp4" data-i18n="phrase_salam">السلام عليكم</button>
+                <button class="quick-btn" data-video="ahlawsahla.mp4" data-i18n="phrase_ahla">أهلاً وسهلاً</button>
+                <button class="quick-btn" data-video="GoodMorning.mp4" data-i18n="phrase_morning">صباح الخير</button>
+                <button class="quick-btn" data-video="Thanks.mp4" data-i18n="phrase_thanks">شكراً</button>
+                <button class="quick-btn" data-video="keefelsaha.mp4" data-i18n="phrase_health">كيف الصحة</button>
+                <button class="quick-btn" data-video="good.mp4" data-i18n="phrase_good">جيد</button>
+                <button class="quick-btn" data-video="no.mp4" data-i18n="phrase_no">لا</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <h1 data-i18n="about_title">عن مشروع Eshara</h1>
+      <p data-i18n="about_desc">مشروع يهدف إلى جسر الهوّة التواصلية بين الصم والمجتمع باستخدام أحدث تقنيات الذكاء الاصطناعي.</p>
+
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-num">29</div>
+          <div class="stat-label" data-i18n="stat_chars">حرف عربي مدعوم</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">&lt; 200ms</div>
+          <div class="stat-label" data-i18n="stat_response">زمن الاستجابة</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">AI</div>
+          <div class="stat-label" data-i18n="stat_ai">MediaPipe + ML</div>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <div class="card">
+          <h3 data-i18n="how_it_works_title">🧠 كيف يعمل؟</h3>
+          <p data-i18n="how_it_works_p1">تلتقط الكاميرا الفيديو المباشر، ويحلل MediaPipe مواضع 21 نقطة في اليد في الوقت الفعلي، ثم يُصنّف نموذج ML الحرف بدقة عالية.</p>
+          <p data-i18n="how_it_works_p2">يتم تأكيد الحرف بعد ثبات الإشارة لمدة 1.5 ثانية لتجنب الأخطاء.</p>
+        </div>
+        <div class="card">
+          <h3 data-i18n="tech_stack_title">🛠️ التقنيات المستخدمة</h3>
+          <p>Python · Flask · MediaPipe · Scikit-learn · Web Speech API · HTML5 Canvas</p>
+        </div>
+      </div>
+
+      <h2 data-i18n="team_title">فريق المشروع</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar">🤖</div>
+          <h4> Noor Alfarraj</h4>
+          <p>AI Engineer</p>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">💻</div>
+          <h4> Noor Adili</h4>
+          <p>Web Developer</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <h1 data-i18n="contact_title">تواصل معنا</h1>
+      <p data-i18n="contact_desc">لديك سؤال أو اقتراح؟ نحن هنا للاستماع.</p>
+
+      <div class="contact-wrap">
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="contact-item-icon">📧</div>
+            <div>
+              <div class="contact-item-label" data-i18n="contact_email_label">البريد الإلكتروني</div>
+              <div class="contact-item-val">example@info.com</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">🌍</div>
+            <div>
+              <div class="contact-item-label" data-i18n="contact_location_label">الموقع</div>
+              <div class="contact-item-val" data-i18n="contact_location_val">الأردن — عمّان</div>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="contactName" data-i18n="contact_name_label">الاسم الكامل</label>
+            <input type="text" id="contactName" data-i18n-placeholder="contact_name_placeholder" placeholder="مثال: أحمد محمد" required />
+          </div>
+          <div class="form-group">
+            <label for="contactEmail" data-i18n="contact_email_label">البريد الإلكتروني</label>
+            <input type="email" id="contactEmail" data-i18n-placeholder="contact_email_placeholder" placeholder="example@email.com" required />
+          </div>
+          <div class="form-group">
+            <label for="contactMsg" data-i18n="contact_msg_label">رسالتك</label>
+            <textarea id="contactMsg" rows="5" data-i18n-placeholder="contact_msg_placeholder" placeholder="اكتب رسالتك هنا..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="contact_submit_btn">📨 إرسال الرسالة</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="translations.js"></script>
+  <script>
+    'use strict';
+
+    // 1. Core Utilities
+    const $ = id => document.getElementById(id);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    let currentLang = localStorage.getItem('eshara-lang') || 'ar';
+
+    function showToast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // 2. Translation Engine
+    function updateUI() {
+      const t = translations[currentLang];
+      
+      // Update text content
+      $$('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) {
+          if (el.tagName === 'STRONG' || el.innerHTML.includes('<strong>')) {
+             el.innerHTML = t[key];
+          } else {
+             el.textContent = t[key];
+          }
+        }
+      });
+
+      // Update placeholders
+      $$('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key]) el.placeholder = t[key];
+      });
+
+      // Update document attributes
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      $('pageTitle').textContent = t.title;
+      $('langToggle').textContent = currentLang === 'ar' ? 'EN' : 'العربية';
+
+      // Update dynamic button texts if camera/mic is active
+      if (cameraOn) {
+        $('toggleCameraUser').textContent = t.btn_stop_cam;
+        $('camLabel').textContent = t.cam_status_live;
+      } else {
+        $('toggleCameraUser').textContent = t.btn_start_cam;
+        $('camLabel').textContent = t.cam_status_off;
+      }
+
+      if (listening) {
+        $('toggleMic').textContent = t.btn_stop_mic;
+      } else {
+        $('toggleMic').textContent = t.btn_start_mic;
+      }
+    }
+
+    $('langToggle').onclick = () => {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('eshara-lang', currentLang);
+      updateUI();
+      showToast(translations[currentLang][`toast_lang_${currentLang}`]);
+    };
+
+    // 3. Navigation
+    function navigateTo(targetId) {
+      $$('main section').forEach(s => s.classList.remove('active'));
+      $$('.nav-link').forEach(l => l.classList.remove('active'));
+      
+      const target = $(targetId);
+      if (target) target.classList.add('active');
+      
+      const link = document.querySelector(`.nav-link[data-target="${targetId}"]`);
+      if (link) link.classList.add('active');
+      
+      window.scrollTo(0, 0);
+    }
+
+    // Bind Navigation
+    document.body.addEventListener('click', e => {
+      const target = e.target.closest('[data-target]');
+      if (target) {
+        e.preventDefault();
+        navigateTo(target.dataset.target);
+        $('mainNav').classList.remove('open');
+        $('hamburger').classList.remove('open');
+      }
+    });
+
+    // 4. Theme Toggle
+    const themeBtn = $('themeToggle');
+    function applyTheme(theme) {
+      if (theme === 'light') document.body.classList.add('light');
+      else document.body.classList.remove('light');
+      localStorage.setItem('eshara-theme', theme);
+    }
+
+    themeBtn.onclick = () => {
+      const isLight = document.body.classList.toggle('light');
+      applyTheme(isLight ? 'light' : 'dark');
+    };
+    applyTheme(localStorage.getItem('eshara-theme') || 'dark');
+
+    // 5. Camera & Sign Translation Logic
+    let stream = null;
+    let cameraOn = false;
+    const camBtn = $('toggleCameraUser');
+    const videoUser = $('videoUser');
+    const canvasUser = $('snapUser');
+    const charEl = $('char');
+    const probEl = $('prob');
+    const probBar = $('probBar');
+    const previewEl = $('preview');
+    
+    let lastChar = null;
+    let lastCharTime = 0;
+    let confirmedText = '';
+    let charLocked = false;
+    let lockTimer = null;
+    const CHAR_HOLD_MS = 1500;
+
+    camBtn.onclick = async () => {
+      const t = translations[currentLang];
+      if (!cameraOn) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          videoUser.srcObject = stream;
+          cameraOn = true;
+          camBtn.textContent = t.btn_stop_cam;
+          $('camDot').classList.add('live');
+          $('camLabel').textContent = t.cam_status_live;
+          tick();
+        } catch (e) {
+          showToast(t.toast_cam_error + e.message);
+        }
+      } else {
+        if(stream) stream.getTracks().forEach(t => t.stop());
+        videoUser.srcObject = null;
+        cameraOn = false;
+        camBtn.textContent = t.btn_start_cam;
+        $('camDot').classList.remove('live');
+        $('camLabel').textContent = t.cam_status_off;
+        charEl.textContent = '—';
+        updateProb(0);
+      }
+    };
+
+    function updateProb(val) {
+      const pct = Math.round(val * 100);
+      probEl.textContent = pct + '%';
+      probBar.style.width = pct + '%';
+    }
+
+    async function tick() {
+      if (cameraOn && videoUser.readyState === 4) {
+        const ctx = canvasUser.getContext('2d');
+        ctx.drawImage(videoUser, 0, 0, canvasUser.width, canvasUser.height);
+        const dataUrl = canvasUser.toDataURL('image/jpeg', 0.7);
+
+        try {
+          const res = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: dataUrl })
+          });
+          const js = await res.json();
+
+          if (js.nohand) {
+            charEl.textContent = '—';
+            updateProb(0);
+            lastChar = null; charLocked = false;
+          } else {
+            const currentChar = js.arabic || js.label || '—';
+            const prob = js.prob || 0;
+            updateProb(prob);
+
+            const now = Date.now();
+            if (currentChar !== lastChar) {
+              lastChar = currentChar;
+              lastCharTime = now;
+              charLocked = false;
+              charEl.textContent = currentChar;
+            } else if (!charLocked && (now - lastCharTime) >= CHAR_HOLD_MS) {
+              confirmedText += (currentChar.toLowerCase() === 'space' ? ' ' : currentChar);
+              previewEl.textContent = confirmedText;
+              previewEl.classList.remove('empty');
+              charLocked = true;
+              charEl.textContent = currentChar + ' ✅';
+              setTimeout(() => { charEl.textContent = currentChar; }, 800);
+            }
+          }
+        } catch (e) {}
+      }
+      if (cameraOn) setTimeout(tick, 200);
+    }
+
+    // 6. Quick Phrases & Video
+    const videoMsg = $('videoMessage');
+    const placeholder = $('videoPlaceholder');
+
+    document.body.addEventListener('click', e => {
+      const btn = e.target.closest('.quick-btn');
+      if (btn) {
+        const src = btn.dataset.video;
+        videoMsg.src = src;
+        placeholder.style.display = 'none';
+        videoMsg.style.display = 'block';
+        videoMsg.classList.add('show');
+        videoMsg.play().catch(console.error);
+        
+        $$('.quick-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        $('deafText').value += btn.textContent + '\n';
+      }
+    });
+
+    // 7. Speech to Text
+    const toggleMicBtn = $('toggleMic');
+    let listening = false;
+
+    const SpeechPlugin = (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition)
+      ? window.Capacitor.Plugins.SpeechRecognition : null;
+
+    async function startCapacitorSTT() {
+      const t = translations[currentLang];
+      try {
+        await SpeechPlugin.requestPermissions();
+        listening = true;
+        toggleMicBtn.textContent = t.btn_stop_mic;
+        await SpeechPlugin.start({
+          language: currentLang === 'ar' ? 'ar-SA' : 'en-US',
+          maxResults: 1,
+          popup: false,
+          partialResults: true,
+        });
+        SpeechPlugin.addListener('partialResults', (data) => {
+          if (data.matches && data.matches.length > 0) {
+            $('deafText').value = data.matches[0];
+          }
+        });
+      } catch(e) {
+        showToast(t.toast_mic_error + ': ' + e.message);
+        listening = false;
+        toggleMicBtn.textContent = translations[currentLang].btn_start_mic;
+      }
+    }
+
+    async function stopCapacitorSTT() {
+      try { await SpeechPlugin.stop(); } catch(e) {}
+      listening = false;
+      toggleMicBtn.textContent = translations[currentLang].btn_start_mic;
+    }
+
+    let recognition = null;
+    function initSTT() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { showToast(translations[currentLang].toast_mic_error); return null; }
+      const r = new SR();
+      r.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+      r.interimResults = true;
+      r.continuous = true;
+      r.onresult = e => {
+        let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+        }
+        if (final.trim()) $('deafText').value += final.trim() + '\n';
+      };
+      r.onend = () => { if (listening) r.start(); };
+      return r;
+    }
+
+    toggleMicBtn.onclick = async () => {
+      const t = translations[currentLang];
+      if (SpeechPlugin) {
+        if (!listening) await startCapacitorSTT();
+        else await stopCapacitorSTT();
+      } else {
+        if (!recognition) recognition = initSTT();
+        if (!recognition) return;
+        if (!listening) {
+          recognition.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+          recognition.start();
+          listening = true;
+          toggleMicBtn.textContent = t.btn_stop_mic;
+        } else {
+          listening = false;
+          recognition.stop();
+          toggleMicBtn.textContent = t.btn_start_mic;
+        }
+      }
+    };
+
+    // 8. Splash & Init
+    window.onload = () => {
+      updateUI();
+      setTimeout(() => $('splashDot').classList.add('expand'), 1000);
+      setTimeout(() => $('splash').classList.add('hide'), 1700);
+    };
+
+    // 9. Clear Text
+    $('clearUserText').onclick = () => {
+      confirmedText = '';
+      previewEl.textContent = '';
+      previewEl.classList.add('empty');
+    };
+    
+    $('clearMic').onclick = () => {
+      $('deafText').value = '';
+    };
+
+    // 10. Hamburger
+    $('hamburger').onclick = () => {
+      $('hamburger').classList.toggle('open');
+      $('mainNav').classList.toggle('open');
+    };
+
+    // 11. TTS
+    $('speakText').onclick = () => {
+      const text = previewEl.textContent.trim();
+      if (!text) return;
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+      window.speechSynthesis.speak(utt);
+    };
+  </script>
+</body>
+</html>

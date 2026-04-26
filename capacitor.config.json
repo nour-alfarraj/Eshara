@@ -1,0 +1,6 @@
+{
+  "appId": "com.eshara.app",
+  "appName": "Eshara",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
